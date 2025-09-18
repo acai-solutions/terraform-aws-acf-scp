@@ -78,6 +78,7 @@ def main():
         logger.error("AWS Organizations error: %s", e)
         raise
 
+
 def _process_ou_assignments(boto3_client, org_id: str, root_ou_id: str, ou_assignments: Dict[str, Any]) -> Dict[str, Any]:
     ou_results: Dict[str, Any] = {}
     for path, assignments in ou_assignments.items():
@@ -105,34 +106,50 @@ def _process_ou_assignments(boto3_client, org_id: str, root_ou_id: str, ou_assig
                     }
     return ou_results
 
-def _get_ous(boto3_client, parent_ou_id, remaining_ou_path, recent_ou_path_name, recent_ou_path_id):
+
+def _get_ous(
+    boto3_client,
+    parent_ou_id,
+    remaining_ou_path,
+    recent_ou_path_name,
+    recent_ou_path_id,
+):
     def get_ous_for_criteria(parent_id, criteria):
         found_ous = []
-        paginator = boto3_client.get_paginator('list_organizational_units_for_parent')
+        paginator = boto3_client.get_paginator("list_organizational_units_for_parent")
         for page in paginator.paginate(ParentId=parent_id):
-            for ou in page['OrganizationalUnits']:
-                if ou['Name'] == criteria or criteria == "*":
+            for ou in page["OrganizationalUnits"]:
+                if ou["Name"] == criteria or criteria == "*":
                     found_ous.append(
                         {
-                            'id': ou['Id'], 
-                            'name': ou['Name'], 
-                            'path_name': f'{recent_ou_path_name}/{ou["Name"]}',
-                            'path_id': f'{recent_ou_path_id}/{ou["Id"]}'
+                            "id": ou["Id"],
+                            "name": ou["Name"],
+                            "path_name": f'{recent_ou_path_name}/{ou["Name"]}',
+                            "path_id": f'{recent_ou_path_id}/{ou["Id"]}',
                         }
                     )
         return found_ous
 
     results = []
-    parts = remaining_ou_path.strip("/").split('/')    
+    parts = remaining_ou_path.strip("/").split("/")
     first_element = parts[0]
     found_ous = get_ous_for_criteria(parent_ou_id, first_element)
     if len(parts) > 1:
-        rest_of_path = '/' + '/'.join(parts[1:])
+        rest_of_path = "/" + "/".join(parts[1:])
         for result in found_ous:
-            results.extend(_get_ous(boto3_client, result['id'], rest_of_path, f"{recent_ou_path_name}/{result['name']}", f"{recent_ou_path_id}/{result['id']}" ))
+            results.extend(
+                _get_ous(
+                    boto3_client,
+                    result["id"],
+                    rest_of_path,
+                    f"{recent_ou_path_name}/{result['name']}",
+                    f"{recent_ou_path_id}/{result['id']}",
+                )
+            )
     else:
         results.extend(found_ous)
     return results
+
 
 def _assume_remote_role(remote_role_arn: Optional[str]) -> Optional[boto3.Session]:
     try:
@@ -151,4 +168,3 @@ def _assume_remote_role(remote_role_arn: Optional[str]) -> Optional[boto3.Sessio
 
 if __name__ == "__main__":
     main()
-
