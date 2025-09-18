@@ -13,7 +13,6 @@ For commercial licensing, contact: contact@acai.gmbh
 """
 
 import json
-import sys
 import boto3
 from botocore.config import Config as boto3_config
 
@@ -36,8 +35,6 @@ def _parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 def main():
-    # org_mgmt_role_arn provided?
-    # Replace sys.argv parsing with argparse
     args = _parse_args()
     expected_org_id = args.expected_org_id
     expected_root_ou_id = args.expected_root_ou_id
