@@ -182,11 +182,11 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_scp_specifications"></a> [scp\_specifications](#input\_scp\_specifications) | The statements of the SCPs. | <pre>map(object({<br>    policy_name : string<br>    description : optional(string, null)<br>    statement_ids : list(string)<br>    tags : optional(map(string), {})<br>  }))</pre> | n/a | yes |
+| <a name="input_scp_specifications"></a> [scp\_specifications](#input\_scp\_specifications) | The statements of the SCPs. | <pre>map(object({<br/>    policy_name : string<br/>    description : optional(string, null)<br/>    statement_ids : list(string)<br/>    tags : optional(map(string), {})<br/>  }))</pre> | n/a | yes |
 | <a name="input_scp_statements"></a> [scp\_statements](#input\_scp\_statements) | The statements of the SCPs. | `map(string)` | n/a | yes |
 | <a name="input_org_mgmt_reader_role_arn"></a> [org\_mgmt\_reader\_role\_arn](#input\_org\_mgmt\_reader\_role\_arn) | ARN to be assumed by the Python, to read the OU structure. Only required, if the provisioning pipeline is not in the context of the Org-Mgmt account. | `string` | `""` | no |
 | <a name="input_resource_tags"></a> [resource\_tags](#input\_resource\_tags) | A map of default tags to assign to the SCPs. | `map(string)` | `{}` | no |
-| <a name="input_scp_assignments"></a> [scp\_assignments](#input\_scp\_assignments) | The assignements of SCPs. | <pre>object({<br>    ou_assignments : optional(map(list(string)), {})      # key: ou-path, value: list of scp_ids to be assinged<br>    account_assignments : optional(map(list(string)), {}) # key: account_id, value: list of scp_ids to be assinged<br>  })</pre> | `null` | no |
+| <a name="input_scp_assignments"></a> [scp\_assignments](#input\_scp\_assignments) | The assignements of SCPs. | <pre>object({<br/>    ou_assignments : optional(map(list(string)), {})      # key: ou-path, value: list of scp_ids to be assinged<br/>    account_assignments : optional(map(list(string)), {}) # key: account_id, value: list of scp_ids to be assinged<br/>  })</pre> | `null` | no |
 
 ## Outputs
 
