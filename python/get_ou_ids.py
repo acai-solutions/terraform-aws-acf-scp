@@ -12,15 +12,15 @@ For commercial licensing, contact: contact@acai.gmbh
 
 """
 
-import json
-import sys
-import boto3
-from botocore.config import Config as boto3_config
-
 # Add imports
 import argparse
+import json
 import logging
+import sys
 from typing import Any, Dict, List, Optional
+
+import boto3
+from botocore.config import Config as boto3_config
 from botocore.exceptions import BotoCoreError, ClientError
 
 # Configure logging (stdout reserved for final JSON output)
