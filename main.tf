@@ -53,14 +53,16 @@ locals {
 # ¦ DATA
 # ---------------------------------------------------------------------------------------------------------------------
 data "external" "get_ou_ids" {
-  program = [
-    "python3",
-    "${path.module}/python/get_ou_ids.py",
-    local.org_id,
-    local.root_ou_id,
-    jsonencode(var.scp_assignments.ou_assignments),
-    var.org_mgmt_reader_role_arn
-  ]
+  program = concat(
+    [
+      "python3",
+      "${path.module}/python/get_ou_ids.py",
+      local.org_id,
+      local.root_ou_id,
+      jsonencode(var.scp_assignments.ou_assignments),
+    ],
+    var.org_mgmt_reader_role_arn != null && var.org_mgmt_reader_role_arn != "" ? ["--role-arn", var.org_mgmt_reader_role_arn] : []
+  )
 }
 
 locals {
