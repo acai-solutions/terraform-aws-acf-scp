@@ -42,3 +42,8 @@ $${resource_tags_block}
         Action:
           - "ssm:*"
         Resource: "arn:aws:ssm:*:*:parameter/acai/acf/scp/productversion"
+      - Effect: Allow
+        Action:
+          - "ssm:DescribeParameters"
+        Resource: "arn:aws:ssm:*:*:parameter/*"
+         
