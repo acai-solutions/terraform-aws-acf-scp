@@ -13,45 +13,60 @@
 ![trivy-shield]
 ![checkov-shield]
 
-<!-- DESCRIPTION -->
-[Terraform][terraform-url] module to provision and assign Service Control Policies (SCPs).
-For SCP staments have a look at this repository: [terraform-aws-acf-scp-statements](https://github.com/acai-solutions/terraform-aws-acf-scp-statements)
+<!-- BEGIN_ACAI_DOCS -->
+[Terraform][terraform-url] module to provision and assign Service Control Policies (SCPs) to Organization Units or AWS accounts.
+For SCP statements have a look at this repository: [terraform-aws-acf-scp-statements](https://github.com/acai-solutions/terraform-aws-acf-scp-statements)
 
-<!-- FEATURES -->
-## Note
+![architecture]
+
+### Features
+
+- Provisions SCPs based on specified statements.
+- Supports the use of wildcards in OU-Paths.
 
 Must have Python3 and boto3 installed at the worker.
 
-## Features
+## Usage
 
-Will provision SCPs based on specified statements.
-Supports wildcards in OU-Paths.
+Consider an AWS Organization with the following OU structure:
 
-For the following demo OU-Structure:
-
-``` text
+```text
 /root
-/root/SCP_CoreAccounts
-/root/SCP_CoreAccounts/Connectivity
-/root/SCP_CoreAccounts/Management
-/root/SCP_CoreAccounts/Security
-/root/SCP_SandboxAccounts
-/root/SCP_WorkloadAccounts
-/root/SCP_WorkloadAccounts/BusinessUnit_1
-/root/SCP_WorkloadAccounts/BusinessUnit_1/CICD
-/root/SCP_WorkloadAccounts/BusinessUnit_1/NonProd
-/root/SCP_WorkloadAccounts/BusinessUnit_1/Prod
-/root/SCP_WorkloadAccounts/BusinessUnit_2
-/root/SCP_WorkloadAccounts/BusinessUnit_2/CICD
-/root/SCP_WorkloadAccounts/BusinessUnit_2/NonProd
-/root/SCP_WorkloadAccounts/BusinessUnit_2/Prod
-/root/SCP_WorkloadAccounts/BusinessUnit_3
-/root/SCP_WorkloadAccounts/BusinessUnit_3/CICD
-/root/SCP_WorkloadAccounts/BusinessUnit_3/NonProd
-/root/SCP_WorkloadAccounts/BusinessUnit_3/Prod
+/root/CoreAccounts
+/root/CoreAccounts/Connectivity
+/root/CoreAccounts/Management
+/root/CoreAccounts/Security
+/root/SandboxAccounts
+/root/WorkloadAccounts
+/root/WorkloadAccounts/BusinessUnit_1
+/root/WorkloadAccounts/BusinessUnit_1/CICD
+/root/WorkloadAccounts/BusinessUnit_1/NonProd
+/root/WorkloadAccounts/BusinessUnit_1/Prod
+/root/WorkloadAccounts/BusinessUnit_2
+/root/WorkloadAccounts/BusinessUnit_2/CICD
+/root/WorkloadAccounts/BusinessUnit_2/NonProd
+/root/WorkloadAccounts/BusinessUnit_2/Prod
+/root/WorkloadAccounts/BusinessUnit_3
+/root/WorkloadAccounts/BusinessUnit_3/CICD
+/root/WorkloadAccounts/BusinessUnit_3/NonProd
+/root/WorkloadAccounts/BusinessUnit_3/Prod
 ```
 
+### Specifying SCP Statements
+
+The module expects SCP specifications as a map. 
+
+Each specification contains a policy_name and a list of statement_ids that correspond to entries in your SCP statements map.
+
+For example, you can pull in SCP statements from the following repository:
+
+For sample SCP statements have a look at this repository: [terraform-aws-acf-scp-statements](https://github.com/acai-solutions/terraform-aws-acf-scp-statements)
+
 ```hcl
+module "scp_statements" {
+  source = "git::https://github.com/acai-solutions/terraform-aws-acf-scp-statements.git?ref=1.0.0"
+}
+
 locals {
   scp_specifications = {
     "top_level" = {
@@ -111,30 +126,43 @@ locals {
       ]
     }
   }
+```
 
+### Specifying SCP Assignments
+
+SCPs can be assigned at both the OU and account levels.
+
+The ou_assignments map pairs OU paths (which are case-sensitive) with lists of SCP policy names.
+
+!!! note "Information"
+    The OU-Names are case-sensitive.
+
+```hcl
   scp_assignments = {
     ou_assignments = {
-      "/root"                                     = ["top_level"]
-      "/root/SCP_CoreAccounts"                    = ["core_accounts"]
-      "/root/SCP_CoreAccounts/Management"         = ["deny_vpc"]
-      "/root/SCP_SandboxAccounts"                 = []
-      "/root/SCP_WorkloadAccounts"                = ["workload"]
-      "/root/SCP_WorkloadAccounts/BusinessUnit_1" = ["workload_class1"]
-      "/root/SCP_WorkloadAccounts/BusinessUnit_2" = ["workload_class1"]
-      "/root/SCP_WorkloadAccounts/BusinessUnit_3" = ["workload_class2"]
-      "/root/SCP_WorkloadAccounts/*/Prod"         = ["workload_prod"]
-      "/root/SCP_WorkloadAccounts/*/NonProd"      = ["workload_non_prod"]
+      "/root"                                 = ["top_level"]
+      "/root/CoreAccounts"                    = ["core_accounts"]
+      "/root/CoreAccounts/Management"         = ["deny_vpc"]
+      "/root/SandboxAccounts"                 = []
+      "/root/WorkloadAccounts"                = ["workload"]
+      "/root/WorkloadAccounts/BusinessUnit_1" = ["workload_class1"]
+      "/root/WorkloadAccounts/BusinessUnit_2" = ["workload_class1"]
+      "/root/WorkloadAccounts/BusinessUnit_3" = ["workload_class2"]
+      "/root/WorkloadAccounts/*/Prod"         = ["workload_prod"]
+      "/root/WorkloadAccounts/*/NonProd"      = ["workload_non_prod"]
     }
     account_assignments = {
       "590183833356" = ["deny_vpc"] # core_logging
     }
   }
 }
+```
 
-module "scp_statements" {
-  source = "git::https://github.com/acai-solutions/terraform-aws-acf-scp-statements.git?ref=1.0.0"
-}
+### Deploy SCP Assignments
 
+Once you’ve defined your SCP statements, specifications, and assignments, deploy the ACF module as shown below:
+
+```hcl
 module "scp_management" {
   source = "git::https://github.com/acai-solutions/terraform-aws-acf-scp.git?ref=1.0.5"
 
@@ -146,6 +174,7 @@ module "scp_management" {
   }
 }
 ```
+<!-- END_ACAI_DOCS -->
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -218,7 +247,7 @@ See [LICENSE][license-url] for full details.
 [acai-shield]: https://img.shields.io/badge/maintained_by-acai.gmbh-CB224B?style=flat
 [acai-docs-shield]: https://img.shields.io/badge/documentation-docs.acai.gmbh-CB224B?style=flat
 [acai-url]: https://acai.gmbh
-[acai-docs-url]: https://docs.acai.gmbh
+[acai-docs-url]: https://docs.acai.gmbh/solution-acf/10_overview/
 [module-version-shield]: https://img.shields.io/badge/module_version-1.1.0-CB224B?style=flat
 [module-release-url]: https://github.com/acai-solutions/terraform-aws-acf-scp/releases
 [terraform-version-shield]: https://img.shields.io/badge/tf-%3E%3D1.3.10-blue.svg?style=flat&color=blueviolet
