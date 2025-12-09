@@ -67,6 +67,15 @@ data "aws_iam_policy_document" "permissions" {
   statement {
     effect = "Allow"
     actions = [
+      "ssm:PutParameter",
+      "ssm:GetParameter",
+      "ssm:DeleteParameter"
+    ]
+    resources = ["arn:aws:ssm:*:*:parameter/acai/acf/scp/productversion"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
       "organizations:DescribeOrganization",
       "organizations:List*",
       "organizations:DescribePolicy",
