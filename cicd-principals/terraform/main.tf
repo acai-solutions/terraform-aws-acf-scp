@@ -67,11 +67,7 @@ data "aws_iam_policy_document" "permissions" {
   statement {
     effect = "Allow"
     actions = [
-      "ssm:PutParameter",
-      "ssm:GetParameter",
-      "ssm:DeleteParameter",
-      "ssm:AddTagsToResource",
-      "ssm:RemoveTagsFromResource",
+      "ssm:*"
     ]
     resources = ["arn:aws:ssm:*:*:parameter/acai/acf/scp/productversion"]
   }

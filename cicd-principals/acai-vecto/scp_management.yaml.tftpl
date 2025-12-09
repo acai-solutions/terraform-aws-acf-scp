@@ -10,7 +10,6 @@ Resources:
       Description: "IAM Role used to provision the OrganizationStructure"
 $${resource_tags_block}
       AssumeRolePolicyDocument:
-        #add trust policy here
         Version: "2012-10-17"
         Statement:
           - Effect: Allow
@@ -41,9 +40,5 @@ $${resource_tags_block}
                 Resource: "*"
       - Effect: Allow
         Action:
-          - "ssm:PutParameter"
-          - "ssm:GetParameter"
-          - "ssm:DeleteParameter"
-          - "ssm:AddTagsToResource"
-          - "ssm:RemoveTagsFromResource"
+          - "ssm:*"
         Resource: "arn:aws:ssm:*:*:parameter/acai/acf/scp/productversion"
