@@ -14,7 +14,7 @@ jobs:
     uses: acai-solutions/github-workflows/.github/workflows/checks-py-tf-module.yml@main
     if: ${{ github.event_name == 'pull_request' }}
     with:
-      test_beds: '["AWS_ESC"]'    
+      test_beds: '["AWS", "AWS_ESC"]'    
     secrets: inherit
 
     
