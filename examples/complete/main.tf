@@ -152,7 +152,7 @@ Demo OU-Structure
   scp_assignments = {
     ou_assignments = {
       "/root/"                                     = ["top_level"]
-      "/root/SCP_CoreAccounts"                    = ["core_accounts"]
+      "/root/SCP_CoreAccounts"                     = ["core_accounts"]
       "/root/SCP_CoreAccounts/Management/"         = ["deny_vpc"]
       "/root/SCP_SandboxAccounts/"                 = []
       "/root/SCP_WorkloadAccounts/"                = ["workload"]
