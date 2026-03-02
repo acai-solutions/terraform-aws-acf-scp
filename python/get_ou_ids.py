@@ -63,9 +63,15 @@ def _parse_args() -> argparse.Namespace:
         "ou_assignments_json", help="JSON string: { '/root/Path': <assignments> }"
     )
     parser.add_argument(
-        "role_arn",
-        nargs="?",
+        "--role-arn",
+        dest="role_arn",
         help="Optional role ARN to assume (e.g. arn:aws:iam::123456789012:role/MyRole)",
+        default=None,
+    )
+    parser.add_argument(
+        "--endpoint-url",
+        dest="endpoint_url",
+        help="AWS Organizations API endpoint URL override (e.g. for AWS ESC: https://organizations.eusc-de-east-1.amazonaws.eu)",
         default=None,
     )
     return parser.parse_args()
@@ -84,6 +90,7 @@ def main():
         raise
 
     role_arn = args.role_arn
+    endpoint_url = args.endpoint_url
     session = _assume_remote_role(role_arn) if role_arn else boto3.Session()
 
     if session is None:
@@ -95,7 +102,10 @@ def main():
             connect_timeout=10,
             read_timeout=30,
         )
-        boto3_client = session.client("organizations", config=boto3_config_settings)
+        client_kwargs = {"config": boto3_config_settings}
+        if endpoint_url:
+            client_kwargs["endpoint_url"] = endpoint_url
+        boto3_client = session.client("organizations", **client_kwargs)
 
         found_org_id = boto3_client.describe_organization()["Organization"]["Id"]
         found_root_ou_id = boto3_client.list_roots()["Roots"][0][

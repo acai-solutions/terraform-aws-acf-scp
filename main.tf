@@ -26,6 +26,8 @@ terraform {
 # ---------------------------------------------------------------------------------------------------------------------
 # ¦ DATA
 # ---------------------------------------------------------------------------------------------------------------------
+data "aws_partition" "current" {}
+data "aws_region" "current" {}
 data "aws_organizations_organization" "organization" {}
 data "aws_organizations_organizational_units" "organization_inits" {
   parent_id = data.aws_organizations_organization.organization.roots[0].id
@@ -70,6 +72,8 @@ data "external" "get_ou_ids" {
       local.org_id,
       local.root_ou_id,
       jsonencode(var.scp_assignments.ou_assignments),
+      "--endpoint-url",
+      "https://organizations.${data.aws_region.current.name}.${data.aws_partition.current.dns_suffix}",
     ],
     var.org_mgmt_reader_role_arn != null && var.org_mgmt_reader_role_arn != "" ? ["--role-arn", var.org_mgmt_reader_role_arn] : []
   )
