@@ -38,7 +38,7 @@ module "create_provisioner" {
   iam_role_settings = {
     name = "cicd_provisioner"
     aws_trustee_arns = [
-      "arn:${data.aws_partition.current.partition}:iam::${var.account_id.org_mgmt}:root",
+      "arn:${data.aws_partition.current.partition}:iam::${var.account_ids.org_mgmt}:root",
     ]
   }
   providers = {

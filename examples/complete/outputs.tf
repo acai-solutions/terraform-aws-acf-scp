@@ -14,18 +14,18 @@ output "account_id" {
   value       = data.aws_caller_identity.current.account_id
 }
 
-output "ou_structure_paths" {
-  description = "ou_structure_paths"
-  value       = module.ou_structure.organizational_units_paths_ids
+output "ou_paths_to_ou_id" {
+  description = "Mapping of OU paths to their corresponding OU IDs."
+  value       = module.ou_structure.ou_paths_to_ou_id
 }
 
 output "scp_management" {
-  description = "scp_management"
+  description = "SCP management module output."
   value       = module.scp_management
 }
 
 output "test_success" {
-  description = "test_success"
+  description = "Indicates whether the SCP management test was successful."
   value = (
     contains(keys(module.scp_management.aws_organizations_policy_ou_attachment), "/root <- top_level") &&
     contains(keys(module.scp_management.aws_organizations_policy_ou_attachment), "/root/SCP_CoreAccounts <- core_accounts") &&

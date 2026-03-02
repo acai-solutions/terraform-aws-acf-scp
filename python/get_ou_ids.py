@@ -37,7 +37,6 @@ Description:
     - Wildcard segment "*" matches all child OUs at that level of the hierarchy.
 """
 
-# Add imports
 import argparse
 import json
 import logging
@@ -64,7 +63,10 @@ def _parse_args() -> argparse.Namespace:
         "ou_assignments_json", help="JSON string: { '/root/Path': <assignments> }"
     )
     parser.add_argument(
-        "--role-arn", dest="role_arn", help="Optional role ARN to assume", default=None
+        "role_arn",
+        nargs="?",
+        help="Optional role ARN to assume (e.g. arn:aws:iam::123456789012:role/MyRole)",
+        default=None,
     )
     return parser.parse_args()
 
@@ -137,7 +139,7 @@ def _process_ou_assignments(
                 "assignments": assignments_list,
             }
         else:
-            normalized = path.replace("/root", "", 1)
+            normalized = path[len("/root"):]
             ous = _get_ous(
                 boto3_client, root_ou_id, normalized, "/root", f"{org_id}/{root_ou_id}"
             )
