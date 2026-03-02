@@ -41,26 +41,38 @@ locals {
       "module_provider" = "ACAI GmbH",
       "module_name"     = "terraform-aws-acf-scp",
       "module_source"   = "github.com/acai-solutions/terraform-aws-acf-scp",
-      //"module_version"  = /*inject_version_start*/ "1.1.0" /*inject_version_end*/
     }
   )
   org_id     = data.aws_organizations_organization.organization.id
   root_ou_id = data.aws_organizations_organization.organization.roots[0].id
 }
 
+# ---------------------------------------------------------------------------------------------------------------------
+# ¦ MODULE VERSION
+# ---------------------------------------------------------------------------------------------------------------------
+resource "aws_ssm_parameter" "module_version" {
+  #checkov:skip=CKV2_AWS_34: AWS SSM Parameter should be Encrypted not required for module version
+  name           = "/acai/acf/scp/productversion"
+  type           = "String"
+  insecure_value = /*inject_version_start*/ "1.2.0" /*inject_version_end*/
+
+  tags = local.resource_tags
+}
 
 # ---------------------------------------------------------------------------------------------------------------------
 # ¦ DATA
 # ---------------------------------------------------------------------------------------------------------------------
 data "external" "get_ou_ids" {
-  program = [
-    "python3",
-    "${path.module}/python/get_ou_ids.py",
-    local.org_id,
-    local.root_ou_id,
-    jsonencode(var.scp_assignments.ou_assignments),
-    var.org_mgmt_reader_role_arn
-  ]
+  program = concat(
+    [
+      "python3",
+      "${path.module}/python/get_ou_ids.py",
+      local.org_id,
+      local.root_ou_id,
+      jsonencode(var.scp_assignments.ou_assignments),
+    ],
+    var.org_mgmt_reader_role_arn != null && var.org_mgmt_reader_role_arn != "" ? ["--role-arn", var.org_mgmt_reader_role_arn] : []
+  )
 }
 
 locals {

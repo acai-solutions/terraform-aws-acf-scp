@@ -10,7 +10,6 @@ Resources:
       Description: "IAM Role used to provision the OrganizationStructure"
 $${resource_tags_block}
       AssumeRolePolicyDocument:
-        #add trust policy here
         Version: "2012-10-17"
         Statement:
           - Effect: Allow
@@ -39,3 +38,12 @@ $${resource_tags_block}
                   - "organizations:AttachPolicy"
                   - "organizations:DetachPolicy"
                 Resource: "*"
+      - Effect: Allow
+        Action:
+          - "ssm:*"
+        Resource: "arn:aws:ssm:*:*:parameter/acai/acf/scp/productversion"
+      - Effect: Allow
+        Action:
+          - "ssm:DescribeParameters"
+        Resource: "arn:aws:ssm:*:*:parameter/*"
+         
