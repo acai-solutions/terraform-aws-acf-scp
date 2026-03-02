@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestIdC(t *testing.T) {
+func TestSCP(t *testing.T) {
 	t.Log("Ensuring boto3 is installed...")
 	cmd := exec.Command("bash", "-c", "pip3 show boto3 || pip3 install boto3")
 	err := cmd.Run()
@@ -16,9 +16,11 @@ func TestIdC(t *testing.T) {
 		t.Fatalf("Failed to ensure boto3 is installed: %v", err)
 	}
 
-	t.Log("Starting ACF AWS IcD Module test")
+	t.Log("Starting ACF AWS SCP Module test")
 
 	terraformDir := "../../examples/complete"
+	stateKey := "terratest/terraform-aws-acf-scp.tfstate"
+	backendConfig := loadBackendConfig(t, stateKey)
 
 	// Create IAM Role
 	terraformPreparation := &terraform.Options{
@@ -29,14 +31,18 @@ func TestIdC(t *testing.T) {
 			"module.create_provisioner",
 			"module.ou_structure",
 		},
+		BackendConfig: backendConfig,
+		Reconfigure:   true,
 	}
 	defer terraform.Destroy(t, terraformPreparation)
 	terraform.InitAndApply(t, terraformPreparation)
 
 	terraformModule := &terraform.Options{
-		TerraformDir: terraformDir,
-		NoColor:      false,
-		Lock:         true,
+		TerraformDir:  terraformDir,
+		NoColor:       false,
+		Lock:          true,
+		BackendConfig: backendConfig,
+		Reconfigure:   true,
 	}
 	defer terraform.Destroy(t, terraformModule)
 	terraform.InitAndApply(t, terraformModule)

@@ -24,6 +24,10 @@ terraform {
   }
 }
 
+# ---------------------------------------------------------------------------------------------------------------------
+# ¦ DATA
+# ---------------------------------------------------------------------------------------------------------------------
+data "aws_partition" "current" {}
 
 # ---------------------------------------------------------------------------------------------------------------------
 # ¦ CREATE PROVISIONER
@@ -34,8 +38,7 @@ module "create_provisioner" {
   iam_role_settings = {
     name = "cicd_provisioner"
     aws_trustee_arns = [
-      "arn:aws:iam::471112796356:root",
-      "arn:aws:iam::471112796356:user/tfc_provisioner"
+      "arn:${data.aws_partition.current.partition}:iam::${var.account_id.org_mgmt}:root",
     ]
   }
   providers = {
@@ -44,7 +47,7 @@ module "create_provisioner" {
 }
 
 provider "aws" {
-  region = "eu-central-1"
+  region = var.aws_region
   alias  = "org_mgmt_euc1"
   assume_role {
     role_arn = module.create_provisioner.iam_role_arn
@@ -148,16 +151,16 @@ Demo OU-Structure
 */
   scp_assignments = {
     ou_assignments = {
-      "/root"                                     = ["top_level"]
+      "/root/"                                     = ["top_level"]
       "/root/SCP_CoreAccounts"                    = ["core_accounts"]
-      "/root/SCP_CoreAccounts/Management"         = ["deny_vpc"]
-      "/root/SCP_SandboxAccounts"                 = []
-      "/root/SCP_WorkloadAccounts"                = ["workload"]
-      "/root/SCP_WorkloadAccounts/BusinessUnit_1" = ["workload_class1"]
-      "/root/SCP_WorkloadAccounts/BusinessUnit_2" = ["workload_class1"]
-      "/root/SCP_WorkloadAccounts/BusinessUnit_3" = ["workload_class2"]
-      "/root/SCP_WorkloadAccounts/*/Prod"         = ["workload_prod"]
-      "/root/SCP_WorkloadAccounts/*/NonProd"      = ["workload_non_prod"]
+      "/root/SCP_CoreAccounts/Management/"         = ["deny_vpc"]
+      "/root/SCP_SandboxAccounts/"                 = []
+      "/root/SCP_WorkloadAccounts/"                = ["workload"]
+      "/root/SCP_WorkloadAccounts/BusinessUnit_1/" = ["workload_class1"]
+      "/root/SCP_WorkloadAccounts/BusinessUnit_2/" = ["workload_class1"]
+      "/root/SCP_WorkloadAccounts/BusinessUnit_3/" = ["workload_class2"]
+      "/root/SCP_WorkloadAccounts/*/Prod/"         = ["workload_prod"]
+      "/root/SCP_WorkloadAccounts/*/NonProd/"      = ["workload_non_prod"]
     }
     account_assignments = {
       "590183833356" = ["deny_vpc"] # core_logging

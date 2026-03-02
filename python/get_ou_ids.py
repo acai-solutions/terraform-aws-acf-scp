@@ -9,7 +9,32 @@ Visit https://www.acai.gmbh or https://docs.acai.gmbh for more information.
 For full license text, see LICENSE file in repository root.
 For commercial licensing, contact: contact@acai.gmbh
 
+Description:
+    Resolves AWS Organizations OU IDs for given OU path strings. Accepts a JSON
+    map of OU paths to SCP assignments, validates the organization and root OU,
+    and outputs a JSON object mapping each path to its resolved OU ID.
+    Optionally assumes a cross-account IAM role before querying the Organizations API.
 
+    Output JSON structure (printed to stdout, compatible with Terraform external data source):
+    {
+        "result": "<JSON-encoded string>"
+    }
+
+    Where the decoded "result" value is:
+    {
+        "<ou-id>": {
+            "path_name": "<human-readable OU path, e.g. /root/Workloads/Prod>",
+            "path_id":   "<org-id>/<root-id>/<ou-id>/... (slash-joined IDs for full path)>",
+            "assignments": [ <original assignment entries from input for this OU> ]
+        },
+        ...
+    }
+
+    Notes:
+    - The outer wrapper {"result": "..."} satisfies the Terraform external data source
+      requirement that all output values are strings.
+    - When multiple input paths resolve to the same OU ID the assignments lists are merged.
+    - Wildcard segment "*" matches all child OUs at that level of the hierarchy.
 """
 
 # Add imports
@@ -101,6 +126,9 @@ def _process_ou_assignments(
         assignments_list: List[Any] = (
             assignments if isinstance(assignments, list) else [assignments]
         )
+
+        # Strip trailing slashes so "/root/a/b/" == "/root/a/b"
+        path = path.rstrip("/") or "/root"
 
         if path == "/root":
             ou_results[root_ou_id] = {

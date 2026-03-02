@@ -30,25 +30,25 @@ Supports wildcards in OU-Paths.
 For the following demo OU-Structure:
 
 ``` text
-/root
-/root/SCP_CoreAccounts
-/root/SCP_CoreAccounts/Connectivity
-/root/SCP_CoreAccounts/Management
-/root/SCP_CoreAccounts/Security
-/root/SCP_SandboxAccounts
-/root/SCP_WorkloadAccounts
-/root/SCP_WorkloadAccounts/BusinessUnit_1
-/root/SCP_WorkloadAccounts/BusinessUnit_1/CICD
-/root/SCP_WorkloadAccounts/BusinessUnit_1/NonProd
-/root/SCP_WorkloadAccounts/BusinessUnit_1/Prod
-/root/SCP_WorkloadAccounts/BusinessUnit_2
-/root/SCP_WorkloadAccounts/BusinessUnit_2/CICD
-/root/SCP_WorkloadAccounts/BusinessUnit_2/NonProd
-/root/SCP_WorkloadAccounts/BusinessUnit_2/Prod
-/root/SCP_WorkloadAccounts/BusinessUnit_3
-/root/SCP_WorkloadAccounts/BusinessUnit_3/CICD
-/root/SCP_WorkloadAccounts/BusinessUnit_3/NonProd
-/root/SCP_WorkloadAccounts/BusinessUnit_3/Prod
+/root/
+/root/SCP_CoreAccounts/
+/root/SCP_CoreAccounts/Connectivity/
+/root/SCP_CoreAccounts/Management/
+/root/SCP_CoreAccounts/Security/
+/root/SCP_SandboxAccounts/
+/root/SCP_WorkloadAccounts/
+/root/SCP_WorkloadAccounts/BusinessUnit_1/
+/root/SCP_WorkloadAccounts/BusinessUnit_1/CICD/
+/root/SCP_WorkloadAccounts/BusinessUnit_1/NonProd/
+/root/SCP_WorkloadAccounts/BusinessUnit_1/Prod/
+/root/SCP_WorkloadAccounts/BusinessUnit_2/
+/root/SCP_WorkloadAccounts/BusinessUnit_2/CICD/
+/root/SCP_WorkloadAccounts/BusinessUnit_2/NonProd/
+/root/SCP_WorkloadAccounts/BusinessUnit_2/Prod/
+/root/SCP_WorkloadAccounts/BusinessUnit_3/
+/root/SCP_WorkloadAccounts/BusinessUnit_3/CICD/
+/root/SCP_WorkloadAccounts/BusinessUnit_3/NonProd/
+/root/SCP_WorkloadAccounts/BusinessUnit_3/Prod/
 ```
 
 ```hcl
@@ -112,18 +112,19 @@ locals {
     }
   }
 
+  # accepts both formats: /root/a/b and /root/a/b/
   scp_assignments = {
     ou_assignments = {
-      "/root"                                     = ["top_level"]
-      "/root/SCP_CoreAccounts"                    = ["core_accounts"]
-      "/root/SCP_CoreAccounts/Management"         = ["deny_vpc"]
-      "/root/SCP_SandboxAccounts"                 = []
-      "/root/SCP_WorkloadAccounts"                = ["workload"]
-      "/root/SCP_WorkloadAccounts/BusinessUnit_1" = ["workload_class1"]
-      "/root/SCP_WorkloadAccounts/BusinessUnit_2" = ["workload_class1"]
-      "/root/SCP_WorkloadAccounts/BusinessUnit_3" = ["workload_class2"]
-      "/root/SCP_WorkloadAccounts/*/Prod"         = ["workload_prod"]
-      "/root/SCP_WorkloadAccounts/*/NonProd"      = ["workload_non_prod"]
+      "/root/"                                     = ["top_level"]
+      "/root/SCP_CoreAccounts"                     = ["core_accounts"]
+      "/root/SCP_CoreAccounts/Management/"         = ["deny_vpc"]
+      "/root/SCP_SandboxAccounts/"                 = []
+      "/root/SCP_WorkloadAccounts/"                = ["workload"]
+      "/root/SCP_WorkloadAccounts/BusinessUnit_1/" = ["workload_class1"]
+      "/root/SCP_WorkloadAccounts/BusinessUnit_2/" = ["workload_class1"]
+      "/root/SCP_WorkloadAccounts/BusinessUnit_3/" = ["workload_class2"]
+      "/root/SCP_WorkloadAccounts/*/Prod/"         = ["workload_prod"]
+      "/root/SCP_WorkloadAccounts/*/NonProd/"      = ["workload_non_prod"]
     }
     account_assignments = {
       "590183833356" = ["deny_vpc"] # core_logging
