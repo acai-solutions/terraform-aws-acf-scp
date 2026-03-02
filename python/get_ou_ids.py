@@ -54,13 +54,13 @@ logger = logging.getLogger(__name__)
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Resolve OU IDs for given OU paths.")
     parser.add_argument(
-        "expected_org_id", help="Expected AWS Organizations ID (e.g., o-xxxxxxxxxx)"
+        "--expected_org_id", required=True, help="Expected AWS Organizations ID (e.g., o-xxxxxxxxxx)"
     )
     parser.add_argument(
-        "expected_root_ou_id", help="Expected Root OU ID (e.g., r-xxxx)"
+        "--expected_root_ou_id", required=True, help="Expected Root OU ID (e.g., r-xxxx)"
     )
     parser.add_argument(
-        "ou_assignments_json", help="JSON string: { '/root/Path': <assignments> }"
+        "--ou_assignments_json", required=True, help="JSON string: { '/root/Path': <assignments> }"
     )
     parser.add_argument(
         "--role-arn",
