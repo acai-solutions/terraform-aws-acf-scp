@@ -10,6 +10,12 @@
 
 
 # ---------------------------------------------------------------------------------------------------------------------
+# ¦ DATA
+# ---------------------------------------------------------------------------------------------------------------------
+data "aws_partition" "current" {}
+
+
+# ---------------------------------------------------------------------------------------------------------------------
 # ¦ VERSIONS
 # ---------------------------------------------------------------------------------------------------------------------
 terraform {
@@ -62,7 +68,21 @@ data "aws_iam_policy_document" "permissions" {
       "organizations:TagResource",
       "organizations:UntagResource"
     ]
-    resources = ["arn:aws:organizations::*:policy/*/service_control_policy/p-*"]
+    resources = ["arn:${data.aws_partition.current.partition}:organizations::*:policy/*/service_control_policy/p-*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ssm:*"
+    ]
+    resources = ["arn:${data.aws_partition.current.partition}:ssm:*:*:parameter/acai/acf/scp/productversion"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ssm:DescribeParameters"
+    ]
+    resources = ["*"]
   }
   statement {
     effect = "Allow"

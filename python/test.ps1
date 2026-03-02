@@ -9,12 +9,12 @@ $awsRootOuId = "r-t15w"
 
 # Define the OU assignments mapping OU paths to Service Control Policies (SCPs)
 $ouAssignments = @{
-    "/root"                                     = @("platinum", "gold")
-    "/root/CoreAccounts"                        = @("platinum", "gold")
-    "/root/Sandbox"                             = @()  # Empty array means no SCPs assigned
-    "/root/WorkloadAccounts"                    = @("platinum", "gold")
-    "/root/WorkloadAccounts/BusinessUnit_3"     = @("silver")
-    "/root/WorkloadAccounts/*/Non-Prod"         = @("iron")
+    "/root/"                                     = @("platinum", "gold")
+    "/root/CoreAccounts/"                        = @("platinum", "gold")
+    "/root/Sandbox/"                             = @()  # Empty array means no SCPs assigned
+    "/root/WorkloadAccounts/"                    = @("platinum", "gold")
+    "/root/WorkloadAccounts/BusinessUnit_3/"     = @("silver")
+    "/root/WorkloadAccounts/*/Non-Prod/"         = @("iron")
 }
 
 # Convert the paths array to a JSON string

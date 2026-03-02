@@ -9,10 +9,34 @@ Visit https://www.acai.gmbh or https://docs.acai.gmbh for more information.
 For full license text, see LICENSE file in repository root.
 For commercial licensing, contact: contact@acai.gmbh
 
+Description:
+    Resolves AWS Organizations OU IDs for given OU path strings. Accepts a JSON
+    map of OU paths to SCP assignments, validates the organization and root OU,
+    and outputs a JSON object mapping each path to its resolved OU ID.
+    Optionally assumes a cross-account IAM role before querying the Organizations API.
 
+    Output JSON structure (printed to stdout, compatible with Terraform external data source):
+    {
+        "result": "<JSON-encoded string>"
+    }
+
+    Where the decoded "result" value is:
+    {
+        "<ou-id>": {
+            "path_name": "<human-readable OU path, e.g. /root/Workloads/Prod>",
+            "path_id":   "<org-id>/<root-id>/<ou-id>/... (slash-joined IDs for full path)>",
+            "assignments": [ <original assignment entries from input for this OU> ]
+        },
+        ...
+    }
+
+    Notes:
+    - The outer wrapper {"result": "..."} satisfies the Terraform external data source
+      requirement that all output values are strings.
+    - When multiple input paths resolve to the same OU ID the assignments lists are merged.
+    - Wildcard segment "*" matches all child OUs at that level of the hierarchy.
 """
 
-# Add imports
 import argparse
 import json
 import logging
@@ -30,16 +54,31 @@ logger = logging.getLogger(__name__)
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Resolve OU IDs for given OU paths.")
     parser.add_argument(
-        "expected_org_id", help="Expected AWS Organizations ID (e.g., o-xxxxxxxxxx)"
+        "--expected_org_id",
+        required=True,
+        help="Expected AWS Organizations ID (e.g., o-xxxxxxxxxx)",
     )
     parser.add_argument(
-        "expected_root_ou_id", help="Expected Root OU ID (e.g., r-xxxx)"
+        "--expected_root_ou_id",
+        required=True,
+        help="Expected Root OU ID (e.g., r-xxxx)",
     )
     parser.add_argument(
-        "ou_assignments_json", help="JSON string: { '/root/Path': <assignments> }"
+        "--ou_assignments_json",
+        required=True,
+        help="JSON string: { '/root/Path': <assignments> }",
     )
     parser.add_argument(
-        "--role-arn", dest="role_arn", help="Optional role ARN to assume", default=None
+        "--role-arn",
+        dest="role_arn",
+        help="Optional role ARN to assume (e.g. arn:aws:iam::123456789012:role/MyRole)",
+        default=None,
+    )
+    parser.add_argument(
+        "--endpoint-url",
+        dest="endpoint_url",
+        help="AWS Organizations API endpoint URL override (e.g. for AWS ESC: https://organizations.eusc-de-east-1.amazonaws.eu)",
+        default=None,
     )
     return parser.parse_args()
 
@@ -57,6 +96,7 @@ def main():
         raise
 
     role_arn = args.role_arn
+    endpoint_url = args.endpoint_url
     session = _assume_remote_role(role_arn) if role_arn else boto3.Session()
 
     if session is None:
@@ -68,7 +108,14 @@ def main():
             connect_timeout=10,
             read_timeout=30,
         )
-        boto3_client = session.client("organizations", config=boto3_config_settings)
+        client_kwargs = {"config": boto3_config_settings}
+        if endpoint_url:
+            client_kwargs["endpoint_url"] = endpoint_url
+            # SigV4 signing requires region_name to match the endpoint region.
+            # Extract it from the hostname: organizations.{region}.amazonaws.{tld}
+            hostname = endpoint_url.split("://", 1)[-1].split("/")[0]
+            client_kwargs["region_name"] = hostname.split(".")[1]
+        boto3_client = session.client("organizations", **client_kwargs)
 
         found_org_id = boto3_client.describe_organization()["Organization"]["Id"]
         found_root_ou_id = boto3_client.list_roots()["Roots"][0][
@@ -102,6 +149,9 @@ def _process_ou_assignments(
             assignments if isinstance(assignments, list) else [assignments]
         )
 
+        # Strip trailing slashes so "/root/a/b/" == "/root/a/b"
+        path = path.rstrip("/") or "/root"
+
         if path == "/root":
             ou_results[root_ou_id] = {
                 "path_name": "/root",
@@ -109,7 +159,7 @@ def _process_ou_assignments(
                 "assignments": assignments_list,
             }
         else:
-            normalized = path.replace("/root", "", 1)
+            normalized = path[len("/root") :]
             ous = _get_ous(
                 boto3_client, root_ou_id, normalized, "/root", f"{org_id}/{root_ou_id}"
             )
