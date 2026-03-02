@@ -26,7 +26,7 @@ $${resource_tags_block}
                 Action:
                   - "organizations:TagResource"
                   - "organizations:UntagResource"
-                Resource: "arn:aws:organizations::*:policy/*/service_control_policy/p-*"
+                Resource: !Sub "arn:${AWS::Partition}:organizations::*:policy/*/service_control_policy/p-*"
               - Effect: Allow
                 Action:
                   - "organizations:DescribeOrganization"
@@ -38,12 +38,12 @@ $${resource_tags_block}
                   - "organizations:AttachPolicy"
                   - "organizations:DetachPolicy"
                 Resource: "*"
-      - Effect: Allow
-        Action:
-          - "ssm:*"
-        Resource: "arn:aws:ssm:*:*:parameter/acai/acf/scp/productversion"
-      - Effect: Allow
-        Action:
-          - "ssm:DescribeParameters"
-        Resource: "arn:aws:ssm:*:*:parameter/*"
+              - Effect: Allow
+                Action:
+                  - "ssm:*"
+                Resource: !Sub "arn:${AWS::Partition}:ssm:*:*:parameter/acai/acf/scp/productversion"
+              - Effect: Allow
+                Action:
+                  - "ssm:DescribeParameters"
+                Resource: "*"
          
