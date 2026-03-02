@@ -47,6 +47,9 @@ locals {
   )
   org_id     = data.aws_organizations_organization.organization.id
   root_ou_id = data.aws_organizations_organization.organization.roots[0].id
+  # AWS Organizations is a global service endpoint in the standard partition (us-east-1).
+  # In non-standard partitions (e.g. ESC), it lives in the actual deployment region.
+  organizations_endpoint_url = "https://organizations.${data.aws_partition.current.dns_suffix == "amazonaws.com" ? "us-east-1" : data.aws_region.current.name}.${data.aws_partition.current.dns_suffix}"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -73,7 +76,7 @@ data "external" "get_ou_ids" {
       local.root_ou_id,
       jsonencode(var.scp_assignments.ou_assignments),
       "--endpoint-url",
-      "https://organizations.${data.aws_region.current.name}.${data.aws_partition.current.dns_suffix}",
+      local.organizations_endpoint_url,
     ],
     var.org_mgmt_reader_role_arn != null && var.org_mgmt_reader_role_arn != "" ? ["--role-arn", var.org_mgmt_reader_role_arn] : []
   )
