@@ -34,6 +34,6 @@ output "test_success" {
     contains(keys(module.scp_management.aws_organizations_policy_ou_attachment), "/root/SCP_WorkloadAccounts/BusinessUnit_1/Prod <- workload_prod") &&
     contains(keys(module.scp_management.aws_organizations_policy_ou_attachment), "/root/SCP_WorkloadAccounts/BusinessUnit_2/NonProd <- workload_non_prod") &&
     contains(keys(module.scp_management.aws_organizations_policy_ou_attachment), "/root/SCP_WorkloadAccounts/BusinessUnit_3/NonProd <- workload_non_prod") &&
-    contains(keys(module.scp_management.aws_organizations_policy_account_attachment), "590183833356 <- deny_vpc")
+    contains(keys(module.scp_management.aws_organizations_policy_account_attachment), "${var.account_ids.workload} <- deny_vpc")
   )
 }
