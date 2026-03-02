@@ -139,7 +139,7 @@ def _process_ou_assignments(
                 "assignments": assignments_list,
             }
         else:
-            normalized = path[len("/root"):]
+            normalized = path[len("/root") :]
             ous = _get_ous(
                 boto3_client, root_ou_id, normalized, "/root", f"{org_id}/{root_ou_id}"
             )
