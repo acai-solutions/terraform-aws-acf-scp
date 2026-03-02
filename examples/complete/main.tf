@@ -163,7 +163,7 @@ Demo OU-Structure
       "/root/SCP_WorkloadAccounts/*/NonProd/"      = ["workload_non_prod"]
     }
     account_assignments = {
-      "590183833356" = ["deny_vpc"] # core_logging
+      "${var.account_ids.workload}" = ["deny_vpc"] # workload
     }
   }
 }
