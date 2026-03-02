@@ -105,6 +105,10 @@ def main():
         client_kwargs = {"config": boto3_config_settings}
         if endpoint_url:
             client_kwargs["endpoint_url"] = endpoint_url
+            # SigV4 signing requires region_name to match the endpoint region.
+            # Extract it from the hostname: organizations.{region}.amazonaws.{tld}
+            hostname = endpoint_url.split("://", 1)[-1].split("/")[0]
+            client_kwargs["region_name"] = hostname.split(".")[1]
         boto3_client = session.client("organizations", **client_kwargs)
 
         found_org_id = boto3_client.describe_organization()["Organization"]["Id"]

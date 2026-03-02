@@ -72,8 +72,11 @@ data "external" "get_ou_ids" {
     [
       "python3",
       "${path.module}/python/get_ou_ids.py",
+      "--expected_org_id",
       local.org_id,
+      "--expected_root_ou_id",
       local.root_ou_id,
+      "--ou_assignments_json",
       jsonencode(var.scp_assignments.ou_assignments),
       "--endpoint-url",
       local.organizations_endpoint_url,
