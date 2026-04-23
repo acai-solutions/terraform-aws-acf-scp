@@ -1,4 +1,4 @@
-# terraform-aws-acf-scp Terraform module
+# AWS Service Control Policy (SCP) - ACF Terraform Module
 
 <!-- LOGO -->
 <a href="https://acai.gmbh">    
