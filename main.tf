@@ -87,7 +87,7 @@ data "external" "get_ou_ids" {
 }
 
 locals {
-  semp = jsondecode(data.external.get_ou_ids.result["result"])
+  ou_paths_with_id = jsondecode(data.external.get_ou_ids.result["result"])
 }
 
 # ---------------------------------------------------------------------------------------------------------------------

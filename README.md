@@ -27,7 +27,13 @@ For SCP statements have a look at this repository: [terraform-aws-acf-scp-statem
 - Provisions SCPs based on specified statements.
 - Supports the use of wildcards in OU-Paths.
 
-Must have Python3 and boto3 installed at the worker.
+### Requirements
+
+Python 3 and `boto3` must be installed on the worker executing Terraform. Install the required Python packages via:
+
+```bash
+pip install -r python/requirements.txt
+```
 
 ## Usage
 
@@ -168,7 +174,7 @@ Once you’ve defined your SCP statements, specifications, and assignments, depl
 
 ```hcl
 module "scp_management" {
-  source = "git::https://github.com/acai-solutions/terraform-aws-acf-scp.git?ref=1.0.5"
+  source = "git::https://github.com/acai-solutions/terraform-aws-acf-scp.git?ref=1.2.0"
 
   scp_statements     = module.scp_statements.scp_statements
   scp_specifications = local.scp_specifications
@@ -185,15 +191,16 @@ module "scp_management" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.10 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.47 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.0 |
+| <a name="requirement_external"></a> [external](#requirement\_external) | >= 2.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.47 |
-| <a name="provider_external"></a> [external](#provider\_external) | n/a |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.0 |
+| <a name="provider_external"></a> [external](#provider\_external) | >= 2.0 |
 
 ## Modules
 

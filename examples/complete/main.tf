@@ -153,7 +153,7 @@ module "scp_management" {
   scp_specifications = local.scp_specifications
   scp_assignments    = local.scp_assignments
   providers = {
-    aws = aws.org_mgmt_euc1
+    aws = aws.org_mgmt_provisioner
   }
   depends_on = [
     module.ou_structure,
