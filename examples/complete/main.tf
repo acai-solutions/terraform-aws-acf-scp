@@ -28,35 +28,6 @@ terraform {
 # ¦ DATA
 # ---------------------------------------------------------------------------------------------------------------------
 data "aws_partition" "current" {}
-
-# ---------------------------------------------------------------------------------------------------------------------
-# ¦ CREATE PROVISIONER
-# ---------------------------------------------------------------------------------------------------------------------
-module "create_provisioner" {
-  source = "../../cicd-principals/terraform"
-
-  iam_role_settings = {
-    name = "cicd_provisioner"
-    aws_trustee_arns = [
-      "arn:${data.aws_partition.current.partition}:iam::${var.account_ids.org_mgmt}:root",
-    ]
-  }
-  providers = {
-    aws = aws.org_mgmt
-  }
-}
-
-provider "aws" {
-  region = var.aws_region
-  alias  = "org_mgmt_euc1"
-  assume_role {
-    role_arn = module.create_provisioner.iam_role_arn
-  }
-}
-
-# ---------------------------------------------------------------------------------------------------------------------
-# ¦ DATA
-# ---------------------------------------------------------------------------------------------------------------------
 data "aws_region" "current" { provider = aws.org_mgmt_euc1 }
 data "aws_caller_identity" "current" { provider = aws.org_mgmt_euc1 }
 
