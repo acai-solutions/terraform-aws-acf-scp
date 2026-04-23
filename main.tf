@@ -62,7 +62,7 @@ resource "aws_ssm_parameter" "module_version" {
   type           = "String"
   insecure_value = /*inject_version_start*/ "1.2.0" /*inject_version_end*/
   overwrite      = true
-  tags = local.resource_tags
+  tags           = local.resource_tags
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
