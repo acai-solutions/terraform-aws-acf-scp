@@ -24,6 +24,7 @@ func TestSCP(t *testing.T) {
 
 	// Create IAM Role
 	terraformPreparation := &terraform.Options{
+		TerraformBinary: getHclBinary(),
 		TerraformDir: terraformDir,
 		NoColor:      false,
 		Lock:         true,
@@ -38,6 +39,7 @@ func TestSCP(t *testing.T) {
 	terraform.InitAndApply(t, terraformPreparation)
 
 	terraformModule := &terraform.Options{
+		TerraformBinary: getHclBinary(),
 		TerraformDir:  terraformDir,
 		NoColor:       false,
 		Lock:          true,
