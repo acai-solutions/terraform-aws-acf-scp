@@ -28,8 +28,8 @@ variable "scp_specifications" {
 variable "scp_assignments" {
   description = "The assignements of SCPs."
   type = object({
-    ou_assignments : optional(map(list(string)), {})      # key: ou-path, value: list of scp_ids to be assinged
-    account_assignments : optional(map(list(string)), {}) # key: account_id, value: list of scp_ids to be assinged
+    ou_assignments : optional(map(list(string)), {})      # key: ou-path, value: list of scp_ids to be assigned
+    account_assignments : optional(map(list(string)), {}) # key: account_id, value: list of scp_ids to be assigned
   })
   default = null
 }
