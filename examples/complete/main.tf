@@ -26,9 +26,8 @@ terraform {
 # ---------------------------------------------------------------------------------------------------------------------
 # ¦ DATA
 # ---------------------------------------------------------------------------------------------------------------------
-data "aws_partition" "current" {}
-data "aws_region" "current" { provider = aws.org_mgmt_euc1 }
-data "aws_caller_identity" "current" { provider = aws.org_mgmt_euc1 }
+data "aws_partition" "current" { provider = aws.org_mgmt }
+data "aws_caller_identity" "current" { provider = aws.org_mgmt }
 
 # ---------------------------------------------------------------------------------------------------------------------
 # ¦ LOCALS

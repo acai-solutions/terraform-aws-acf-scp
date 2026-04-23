@@ -29,7 +29,7 @@ module "create_provisioner" {
 
 provider "aws" {
   region = var.aws_region
-  alias  = "org_mgmt_euc1"
+  alias  = "org_mgmt_provisioner"
   assume_role {
     role_arn = module.create_provisioner.iam_role_arn
   }
