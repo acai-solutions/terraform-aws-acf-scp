@@ -13,12 +13,16 @@
 # ¦ REQUIREMENTS
 # ---------------------------------------------------------------------------------------------------------------------
 terraform {
-  required_version = ">= 1.3.10"
+  required_version = ">= 1.5.0"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.47"
+      version = ">= 6.0"
+    }
+    external = {
+      source  = "hashicorp/external"
+      version = ">= 2.0"
     }
   }
 }
@@ -29,9 +33,6 @@ terraform {
 data "aws_partition" "current" {}
 data "aws_region" "current" {}
 data "aws_organizations_organization" "organization" {}
-data "aws_organizations_organizational_units" "organization_inits" {
-  parent_id = data.aws_organizations_organization.organization.roots[0].id
-}
 
 # ---------------------------------------------------------------------------------------------------------------------
 # ¦ LOCALS
@@ -86,7 +87,7 @@ data "external" "get_ou_ids" {
 }
 
 locals {
-  ou_paths_with_id = jsondecode(data.external.get_ou_ids.result["result"])
+  semp = jsondecode(data.external.get_ou_ids.result["result"])
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
